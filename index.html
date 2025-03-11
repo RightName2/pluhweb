@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search</title>
+    <style>
+        :root {
+            --bg-main: #202124;
+            --bg-secondary: #303134;
+            --text-primary: #e8eaed;
+            --text-secondary: #969ba1;
+            --accent: #8ab4f8;
+            --input-bg: #303134;
+            --button-bg: #303134;
+            --border: #5f6368;
+            --hover: #3c4043;
+            --modal-bg: #202124;
+        }
+        body, html {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background: var(--bg-main);
+            color: var(--text-primary);
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            padding: 12px 20px;
+            align-items: center;
+        }
+        .header a {
+            margin-right: 15px;
+            text-decoration: none;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        .login-btn {
+            background: var(--accent);
+            color: var(--bg-main);
+            border: none;
+            padding: 9px 23px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .logo {
+            margin-bottom: 25px;
+            font-size: 80px;
+            font-weight: 400;
+        }
+        .logo span:nth-child(1) { color: #4285f4; }
+        .logo span:nth-child(2) { color: #ea4335; }
+        .logo span:nth-child(3) { color: #fbbc05; }
+        .logo span:nth-child(4) { color: #4285f4; }
+        .logo span:nth-child(5) { color: #34a853; }
+        .logo span:nth-child(6) { color: #ea4335; }
+        .search-box {
+            width: 540px;
+            max-width: 90%;
+            height: 44px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 0 15px;
+            display: flex;
+            align-items: center;
+        }
+        .search-box:hover {
+            background: var(--hover);
+        }
+        .search-input {
+            width: 100%;
+            height: 34px;
+            background: transparent;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: var(--text-primary);
+        }
+        .footer {
+            background: var(--bg-secondary);
+            padding: 15px;
+        }
+        .footer-links {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+        .footer-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: 10px;
+            font-size: 14px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            align-items: center;
+            justify-content: center;
+        }
+        .modal-content {
+            background: var(--modal-bg);
+            padding: 30px 40px;
+            border-radius: 8px;
+            width: 370px;
+            max-width: 90%;
+            border: 1px solid var(--border);
+        }
+        .modal-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        .modal-header h2 {
+            color: var(--text-primary);
+            margin: 0 0 10px;
+            font-weight: 500;
+            font-size: 24px;
+        }
+        .modal-header p {
+            color: var(--text-secondary);
+            margin: 0;
+            font-size: 16px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 14px;
+            color: var(--text-primary);
+            box-sizing: border-box;
+        }
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+        }
+        .close-btn {
+            background: var(--button-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 14px;
+            padding: 10px 16px;
+            cursor: pointer;
+        }
+        .submit-btn {
+            background: var(--accent);
+            color: var(--bg-main);
+            border: none;
+            padding: 10px 16px;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+        }
+        .create-btn {
+            color: var(--accent);
+            background: none;
+            border: none;
+            padding: 0;
+            font-size: 14px;
+            cursor: pointer;
+            text-decoration: underline;
+            margin-top: 15px;
+        }
+        .account-btn {
+            margin-left: auto;
+            border: none;
+            background: none;
+            color: var(--text-primary);
+            cursor: pointer;
+            font-size: 14px;
+            padding: 8px;
+        }
+        .admin-panel {
+            display: none;
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 300px;
+            height: 100%;
+            background: var(--bg-secondary);
+            border-left: 1px solid var(--border);
+            padding: 20px;
+            overflow-y: auto;
+            z-index: 2;
+        }
+        .user-item {
+            padding: 10px;
+            border-bottom: 1px solid var(--border);
+        }
+        .ban-btn {
+            background: #ea4335;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .tabs {
+            display: flex;
+            margin-bottom: 15px;
+        }
+        .tab {
+            padding: 10px;
+            cursor: pointer;
+            margin-right: 10px;
+            border-bottom: 2px solid transparent;
+        }
+        .tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+        }
+        .message {
+            color: #ea4335;
+            margin-top: 5px;
+            font-size: 12px;
+            display: none;
+        }
+        .search-users {
+            width: 100%;
+            padding: 8px;
+            background: var(--input-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            margin-bottom: 10px;
+            border-radius: 4px;
+        }
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+        }
+        .page-btn {
+            background: var(--button-bg);
+            border: 1px solid var(--border);
+            color: var(--text-primary);
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <a href="#">Gmail</a>
+            <a href="#">Images</a>
+            <button class="account-btn" id="adminBtn" style="display:none">Admin</button>
+            <button class="login-btn" id="loginBtn">Sign in</button>
+        </div>
+        
+        <div class="main">
+            <div class="logo">
+                <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+            </div>
+            <div class="search-box">
+                <input type="text" class="search-input">
+            </div>
+        </div>
+        
+        <div class="footer">
+            <div class="footer-links">
+                <div>
+                    <a href="#">About</a>
+                    <a href="#">Advertising</a>
+                    <a href="#">Business</a>
+                </div>
+                <div>
+                    <a href="#">Privacy</a>
+                    <a href="#">Terms</a>
+                    <a href="#">Settings</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Login Modal -->
+    <div id="loginModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Sign in</h2>
+                <p>Use your Google Account</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email or phone</label>
+                    <input type="email" id="email" required>
+                    <div id="emailError" class="message">Couldn't find your Google Account</div>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required>
+                    <div id="passwordError" class="message">Wrong password. Try again.</div>
+                </div>
+                <div style="text-align:center">
+                    <button type="button" class="create-btn" id="createAccountBtn">Create account</button>
+                </div>
+                <div class="form-actions">
+                    <button type="button" class="close-btn" id="closeBtn">Cancel</button>
+                    <button type="submit" class="submit-btn">Sign in</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Admin Panel -->
+    <div id="adminPanel" class="admin-panel">
+        <h2>Admin Panel</h2>
+        <div class="tabs">
+            <div class="tab active" data-tab="users">Users</div>
+            <div class="tab" data-tab="logs">Login Logs</div>
+        </div>
+        <div id="usersTab">
+            <h3>User Management</h3>
+            <input type="text" class="search-users" id="searchUsers" placeholder="Search users...">
+            <div id="userList"></div>
+            <div class="pagination">
+                <button class="page-btn" id="prevPage">Previous</button>
+                <span id="pageInfo">Page 1</span>
+                <button class="page-btn" id="nextPage">Next</button>
+            </div>
+        </div>
+        <div id="logsTab" style="display:none">
+            <h3>Login Attempts</h3>
+            <div id="logList"></div>
+            <div class="pagination">
+                <button class="page-btn" id="prevLogPage">Previous</button>
+                <span id="logPageInfo">Page 1</span>
+                <button class="page-btn" id="nextLogPage">Next</button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Generate 100 user accounts
+        function generateUsers() {
+            const userList = [
+                { id: 1, email: 'admin@gmail.com', password: 'admin123', isAdmin: true, ip: '192.168.1.1', lastLogin: '2025-03-11 09:15' }
+            ];
+            
+            for (let i = 1; i <= 99; i++) {
+                userList.push({
+                    id: i + 1,
+                    email: `user${i}@gmail.com`,
+                    password: 'pass123',
+                    isAdmin: false,
+                    ip: `192.168.${Math.floor(i/255)}.${i % 255}`,
+                    lastLogin: getRandomDate(),
+                    banned: i % 10 === 0 // Every 10th user is banned initially for demo purposes
+                });
+            }
+            
+            return userList;
+        }
+        
+        // Get random date for last login
+        function getRandomDate() {
+            const start = new Date(2025, 0, 1);
+            const end = new Date(2025, 2, 11);
+            const randomDate = new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()));
+            return randomDate.toLocaleString();
+        }
+        
+        // Simulated user database
+        const users = generateUsers();
+        
+        // Login logs
+        const loginLogs = [];
+        
+        // Current user
+        let currentUser = null;
+        
+        // Pagination variables
+        let currentUserPage = 1;
+        let currentLogPage = 1;
+        const usersPerPage = 10;
+        const logsPerPage = 10;
+        let filteredUsers = [...users];
+        
+        // DOM Elements
+        const loginModal = document.getElementById("loginModal");
+        const loginBtn = document.getElementById("loginBtn");
+        const closeBtn = document.getElementById("closeBtn");
+        const loginForm = document.getElementById("loginForm");
+        const adminBtn = document.getElementById("adminBtn");
+        const adminPanel = document.getElementById("adminPanel");
+        const userList = document.getElementById("userList");
+        const logList = document.getElementById("logList");
+        const emailError = document.getElementById("emailError");
+        const passwordError = document.getElementById("passwordError");
+        const tabs = document.querySelectorAll(".tab");
+        const searchUsers = document.getElementById("searchUsers");
+        const prevPage = document.getElementById("prevPage");
+        const nextPage = document.getElementById("nextPage");
+        const pageInfo = document.getElementById("pageInfo");
+        const prevLogPage = document.getElementById("prevLogPage");
+        const nextLogPage = document.getElementById("nextLogPage");
+        const logPageInfo = document.getElementById("logPageInfo");
+        
+        // Show login modal
+        loginBtn.onclick = function() {
+            loginModal.style.display = "flex";
+            emailError.style.display = "none";
+            passwordError.style.display = "none";
+        }
+        
+        // Close login modal
+        closeBtn.onclick = function() {
+            loginModal.style.display = "none";
+        }
+        
+        // Click outside modal to close
+        window.onclick = function(event) {
+            if (event.target == loginModal) {
+                loginModal.style.display = "none";
+            }
+            if (event.target != adminPanel && event.target != adminBtn && !adminPanel.contains(event.target)) {
+                adminPanel.style.display = "none";
+            }
+        }
+        
+        // Toggle admin panel
+        adminBtn.onclick = function() {
+            if (adminPanel.style.display === "block") {
+                adminPanel.style.display = "none";
+            } else {
+                adminPanel.style.display = "block";
+                refreshUserList();
+                refreshLogList();
+            }
+        }
+        
+        // Tab switching
+        tabs.forEach(tab => {
+            tab.addEventListener('click', function() {
+                const tabName = this.getAttribute('data-tab');
+                
+                // Update active tab
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                // Show appropriate content
+                if (tabName === 'users') {
+                    document.getElementById('usersTab').style.display = 'block';
+                    document.getElementById('logsTab').style.display = 'none';
+                } else {
+                    document.getElementById('usersTab').style.display = 'none';
+                    document.getElementById('logsTab').style.display = 'block';
+                }
+            });
+        });
+        
+        // Search users
+        searchUsers.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            filteredUsers = users.filter(user => 
+                user.email.toLowerCase().includes(searchTerm) ||
+                user.ip.includes(searchTerm)
+            );
+            currentUserPage = 1;
+            refreshUserList();
+        });
+        
+        // Pagination for users
+        prevPage.addEventListener('click', function() {
+            if (currentUserPage > 1) {
+                currentUserPage--;
+                refreshUserList();
+            }
+        });
+        
+        nextPage.addEventListener('click', function() {
+            if (currentUserPage < Math.ceil(filteredUsers.length / usersPerPage)) {
+                currentUserPage++;
+                refreshUserList();
+            }
+        });
+        
+        // Pagination for logs
+        prevLogPage.addEventListener('click', function() {
+            if (currentLogPage > 1) {
+                currentLogPage--;
+                refreshLogList();
+            }
+        });
+        
+        nextLogPage.addEventListener('click', function() {
+            if (currentLogPage < Math.ceil(loginLogs.length / logsPerPage)) {
+                currentLogPage++;
+                refreshLogList();
+            }
+        });
+        
+        // Login form submission - API simulation
+        loginForm.onsubmit = function(event) {
+            event.preventDefault();
+            const email = document.getElementById("email").value;
+            const password = document.getElementById("password").value;
+            
+            // Simulate API call
+            setTimeout(() => {
+                const user = authenticateUser(email, password);
+                
+                if (user) {
+                    // Successful login
+                    currentUser = user;
+                    loginModal.style.display = "none";
+                    loginBtn.textContent = email;
+                    
+                    // Show admin button if admin
+                    if (user.isAdmin) {
+                        adminBtn.style.display = "block";
+                    }
+                    
+                    // Log the login attempt
+                    const timestamp = new Date().toLocaleString();
+                    const ip = generateRandomIP();
+                    loginLogs.push({
+                        email: email,
+                        timestamp: timestamp,
+                        ip: ip,
+                        success: true
+                    });
+                    
+                    // Update user's IP and last login
+                    user.ip = ip;
+                    user.lastLogin = timestamp;
+                    
+                    loginForm.reset();
+                } else {
+                    // Failed login
+                    const foundUser = users.find(u => u.email === email);
+                    if (foundUser) {
+                        if (foundUser.banned) {
+                            passwordError.textContent = "Account has been banned";
+                        } else {
+                            passwordError.textContent = "Wrong password. Try again.";
+                        }
+                        passwordError.style.display = "block";
+                        emailError.style.display = "none";
+                    } else {
+                        emailError.style.display = "block";
+                        passwordError.style.display = "none";
+                    }
+                    
+                    // Log the failed attempt
+                    loginLogs.push({
+                        email: email,
+                        timestamp: new Date().toLocaleString(),
+                        ip: generateRandomIP(),
+                        success: false
+                    });
+                }
+            }, 500);
+        }
+        
+        // Authentication function
+        function authenticateUser(email, password) {
+            return users.find(user => user.email === email && user.password === password && !user.banned);
+        }
+        
+        // Generate a random IP address
+        function generateRandomIP() {
+            return `${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
+        }
+        
+        // Refresh the user list in admin panel
+        function refreshUserList() {
+            userList.innerHTML = '';
+            
+            // Calculate page limits
+            const startIndex = (currentUserPage - 1) * usersPerPage;
+            const endIndex = startIndex + usersPerPage;
+            const paginatedUsers = filteredUsers.slice(startIndex, endIndex);
+            
+            // Update page info
+            pageInfo.textContent = `Page ${currentUserPage} of ${Math.max(1, Math.ceil(filteredUsers.length / usersPerPage))}`;
+            
+            // Disable/enable buttons
+            prevPage.disabled = currentUserPage === 1;
+            nextPage.disabled = currentUserPage >= Math.ceil(filteredUsers.length / usersPerPage);
+            
+            if (paginatedUsers.length === 0) {
+                userList.innerHTML = '<div class="user-item">No users found</div>';
+                return;
+            }
+            
+            paginatedUsers.forEach(user => {
+                const userItem = document.createElement('div');
+                userItem.className = 'user-item';
+                userItem.innerHTML = `
+                    <div><strong>Email:</strong> ${user.email}</div>
+                    <div><strong>IP:</strong> ${user.ip}</div>
+                    <div><strong>Last Login:</strong> ${user.lastLogin}</div>
+                    <div><strong>Admin:</strong> ${user.isAdmin ? 'Yes' : 'No'}</div>
+                    <div><strong>Status:</strong> ${user.banned ? 'Banned' : 'Active'}</div>
+                `;
+                
+                if (!user.isAdmin && currentUser && currentUser.isAdmin) {
+                    const banBtn = document.createElement('button');
+                    banBtn.className = 'ban-btn';
+                    banBtn.textContent = user.banned ? 'Unban User' : 'Ban User';
+                    banBtn.onclick = function() {
+                        user.banned = !user.banned;
+                        refreshUserList();
+                    };
+                    userItem.appendChild(banBtn);
+                }
+                
+                userList.appendChild(userItem);
+            });
+        }
+        
+        // Refresh login logs
+        function refreshLogList() {
+            logList.innerHTML = '';
+            
+            // Calculate page limits
+            const startIndex = (currentLogPage - 1) * logsPerPage;
+            const endIndex = startIndex + logsPerPage;
+            const paginatedLogs = loginLogs.slice(startIndex, endIndex);
+            
+            // Update page info
+            logPageInfo.textContent = `Page ${currentLogPage} of ${Math.max(1, Math.ceil(loginLogs.length / logsPerPage))}`;
+            
+            // Disable/enable buttons
+            prevLogPage.disabled = currentLogPage === 1;
+            nextLogPage.disabled = currentLogPage >= Math.ceil(loginLogs.length / logsPerPage);
+            
+            if (paginatedLogs.length === 0) {
+                logList.innerHTML = '<div class="user-item">No login logs available</div>';
+                return;
+            }
+            
+            paginatedLogs.forEach(log => {
+                const logItem = document.createElement('div');
+                logItem.className = 'user-item';
+                logItem.innerHTML = `
+                    <div><strong>Email:</strong> ${log.email}</div>
+                    <div><strong>Time:</strong> ${log.timestamp}</div>
+                    <div><strong>IP:</strong> ${log.ip}</div>
+                    <div><strong>Status:</strong> ${log.success ? 'Success' : 'Failed'}</div>
+                `;
+                logList.appendChild(logItem);
+            });
+        }
+        
+        // Create account button (placeholder)
+        document.getElementById("createAccountBtn").onclick = function() {
+            alert("Create account functionality would be implemented here");
+        }
+        
+        // Initialize filtered users
+        filteredUsers = [...users];
+    </script>
+</body>
+</html>
